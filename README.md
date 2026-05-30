@@ -42,7 +42,7 @@ Just open `index.html` in any modern browser. No installation, no internet conne
 
 ## Live version
 
-[Take the test →](https://yourusername.github.io/optimism-test) *(update this link once deployed)*
+[Take the test →](https://yourusername.github.io/optimism-test) 
 
 ## Based on
 
