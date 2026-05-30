@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Seligman Optimism Test</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #f5f0e8; --bg2: #ede7d9; --ink: #1a1612; --ink2: #5c5248;
+    --accent: #b85c38; --accent2: #d4874e; --good: #3a6b4a; --bad: #8b3a3a;
+    --card: #faf7f2; --border: #d9d0c0;
+  }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--ink); min-height: 100vh; line-height: 1.6; }
+
+  .header { background: var(--ink); color: var(--bg); padding: 48px 40px 40px; position: relative; overflow: hidden; }
+  .header::before { content: ''; position: absolute; top: -60px; right: -60px; width: 280px; height: 280px; border-radius: 50%; background: var(--accent); opacity: 0.15; }
+  .header-inner { max-width: 760px; margin: 0 auto; position: relative; }
+  .header-label { font-weight: 500; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--accent2); margin-bottom: 12px; }
+  .header h1 { font-family: 'Playfair Display', serif; font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 600; line-height: 1.1; margin-bottom: 16px; }
+  .header-sub { font-size: 15px; color: #c8bfb0; max-width: 520px; font-weight: 300; }
+
+  .progress-wrap { background: var(--bg2); border-bottom: 1px solid var(--border); padding: 16px 40px; position: sticky; top: 0; z-index: 100; }
+  .progress-inner { max-width: 760px; margin: 0 auto; display: flex; align-items: center; gap: 16px; }
+  .progress-bar-bg { flex: 1; height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+  .progress-bar-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.4s ease; }
+  .progress-text { font-size: 13px; font-weight: 500; color: var(--ink2); white-space: nowrap; }
+  .preset-btns { display: flex; gap: 6px; }
+  .preset-btn { font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 500; padding: 5px 10px; border-radius: 6px; cursor: pointer; border: 1.5px solid var(--border); background: var(--card); color: var(--ink2); transition: all 0.18s; white-space: nowrap; }
+  .preset-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  .main { max-width: 760px; margin: 0 auto; padding: 40px 40px 80px; }
+
+  .question-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 32px; margin-bottom: 24px; transition: box-shadow 0.2s; animation: fadeSlideIn 0.35s ease forwards; }
+  @keyframes fadeSlideIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+  .question-card.answered { background: #f0ede6; }
+  .q-number { font-size: 11px; font-weight: 500; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; }
+  .q-scenario { font-family: 'Playfair Display', serif; font-size: 17px; font-style: italic; color: var(--ink); margin-bottom: 20px; line-height: 1.5; }
+  .q-choices { display: flex; flex-direction: column; gap: 10px; }
+  .q-choice { display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px; border: 1.5px solid var(--border); border-radius: 8px; cursor: pointer; background: white; text-align: left; font-family: 'DM Sans', sans-serif; font-size: 14.5px; color: var(--ink); transition: all 0.18s; line-height: 1.5; }
+  .q-choice:hover { border-color: var(--accent2); background: #fdf8f3; }
+  .q-choice.selected { border-color: var(--accent); background: #fdf3ec; }
+  .choice-label { flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%; background: var(--bg2); border: 1.5px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: var(--ink2); transition: all 0.18s; margin-top: 1px; }
+  .q-choice.selected .choice-label { background: var(--accent); border-color: var(--accent); color: white; }
+
+  .section-divider { display: flex; align-items: center; gap: 16px; margin: 32px 0 20px; }
+  .section-divider-line { flex: 1; height: 1px; background: var(--border); }
+  .section-divider-label { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; font-weight: 500; color: var(--ink2); }
+
+  .submit-wrap { text-align: center; margin-top: 40px; }
+  .submit-btn { background: var(--accent); color: white; border: none; padding: 16px 48px; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 500; border-radius: 8px; cursor: pointer; letter-spacing: 0.5px; transition: background 0.2s, transform 0.15s; }
+  .submit-btn:hover { background: #a04e30; transform: translateY(-1px); }
+  .submit-btn:disabled { background: #c0a898; cursor: not-allowed; transform: none; }
+  .submit-note { font-size: 13px; color: var(--ink2); margin-top: 10px; }
+
+  /* RESULTS */
+  #results-section { display: none; }
+  .results-header { background: var(--ink); color: var(--bg); padding: 48px 40px; }
+  .results-header-inner { max-width: 760px; margin: 0 auto; }
+  .results-overall-label { color: var(--accent2); font-size: 13px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; }
+  .results-header h2 { font-family: 'Playfair Display', serif; font-size: clamp(1.8rem, 4vw, 2.8rem); margin-bottom: 6px; }
+  .results-header .overall-score-line { font-size: 15px; color: #c8bfb0; }
+
+  .results-body { max-width: 760px; margin: 0 auto; padding: 40px; }
+
+  /* OVERALL BANNER */
+  .overall-banner { background: var(--ink); color: var(--bg); border-radius: 12px; padding: 28px 32px; margin-bottom: 12px; }
+  .overall-banner-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; margin-bottom: 14px; }
+  .overall-banner-left { flex: 1; }
+  .overall-banner-left h3 { font-family: 'Playfair Display', serif; font-size: 1.1rem; margin-bottom: 4px; }
+  .overall-banner-left .what { font-size: 13px; color: #c8bfb0; line-height: 1.6; }
+  .overall-score-badge { text-align: right; flex-shrink: 0; }
+  .overall-score-badge .score-num { font-family: 'Playfair Display', serif; font-size: 3rem; font-weight: 600; color: var(--accent2); line-height: 1; }
+  .overall-score-badge .score-band { font-size: 12px; color: #c8bfb0; letter-spacing: 1px; text-transform: uppercase; margin-top: 4px; }
+  .overall-banner-interp { font-size: 14px; color: #d8cfbf; line-height: 1.7; border-top: 1px solid #333; padding-top: 14px; }
+
+  /* G/B SUMMARY ROW */
+  .gb-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 12px; }
+  .gb-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 22px 24px; }
+  .gb-card.good { border-left: 4px solid var(--good); }
+  .gb-card.bad  { border-left: 4px solid var(--bad); }
+  .gb-card-title { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; font-weight: 500; color: var(--ink2); margin-bottom: 6px; }
+  .gb-card-score { font-family: 'Playfair Display', serif; font-size: 2.2rem; font-weight: 600; line-height: 1; margin-bottom: 4px; }
+  .gb-card-score.good { color: var(--good); }
+  .gb-card-score.bad  { color: var(--bad); }
+  .gb-card-band { font-size: 12px; font-weight: 500; color: var(--ink2); margin-bottom: 6px; }
+  .gb-card-what { font-size: 12.5px; color: var(--ink2); line-height: 1.6; margin-bottom: 8px; border-top: 1px solid var(--border); padding-top: 8px; }
+  .gb-card-interp { font-size: 13.5px; color: var(--ink); line-height: 1.7; }
+
+  /* DIMENSION SECTIONS */
+  .dim-section-header { margin: 36px 0 16px; display: flex; align-items: center; gap: 12px; }
+  .dim-section-header-line { flex: 1; height: 1px; background: var(--border); }
+  .dim-section-header-label { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; font-weight: 500; }
+  .dim-section-header-label.good { color: var(--good); }
+  .dim-section-header-label.bad  { color: var(--bad); }
+
+  .dim-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin-bottom: 14px; }
+  .dim-card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 12px; }
+  .dim-card-title { font-family: 'Playfair Display', serif; font-size: 1.05rem; font-weight: 600; }
+  .dim-card-badge { text-align: right; flex-shrink: 0; }
+  .dim-card-badge .dim-score { font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 600; line-height: 1; }
+  .dim-card-badge .dim-score.good { color: var(--good); }
+  .dim-card-badge .dim-score.bad  { color: var(--bad); }
+  .dim-card-badge .dim-band { font-size: 11px; letter-spacing: 1px; text-transform: uppercase; font-weight: 500; color: var(--ink2); }
+  .dim-bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+  .dim-bar-bg { flex: 1; background: var(--bg2); border-radius: 4px; height: 6px; overflow: hidden; }
+  .dim-bar-fill { height: 100%; border-radius: 4px; transition: width 1s ease; }
+  .dim-bar-fill.good { background: var(--good); }
+  .dim-bar-fill.bad  { background: var(--bad); }
+  .dim-bar-max { font-size: 11px; color: var(--ink2); }
+  .dim-what { font-size: 13px; color: var(--ink2); line-height: 1.65; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+  .dim-interp { font-size: 14px; color: var(--ink); line-height: 1.75; }
+
+  .retry-btn { background: transparent; border: 1.5px solid var(--ink); color: var(--ink); padding: 12px 36px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
+  .retry-btn:hover { background: var(--ink); color: var(--bg); }
+
+  .export-bar { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; margin-top: 36px; padding-top: 28px; border-top: 1px solid var(--border); }
+  .export-label { font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; font-weight: 500; color: var(--ink2); margin-right: 4px; }
+  .export-btn { display: flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 13.5px; font-weight: 500; cursor: pointer; transition: all 0.18s; border: 1.5px solid var(--border); background: var(--card); color: var(--ink); }
+  .export-btn:hover { border-color: var(--accent); color: var(--accent); background: #fdf3ec; }
+  .export-btn svg { flex-shrink: 0; }
+  .export-btn.copied { border-color: var(--good); color: var(--good); background: #f0f5f1; }
+
+  @media print {
+    .export-bar, .retry-btn, #quiz-section, .results-header { display: none !important; }
+    #results-section { display: block !important; }
+    .results-body { padding: 24px !important; }
+    body { background: white !important; }
+    .overall-banner { background: #1a1612 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .dim-bar-fill { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  @media (max-width: 600px) {
+    .header, .progress-wrap { padding-left: 20px; padding-right: 20px; }
+    .main, .results-body { padding-left: 20px; padding-right: 20px; }
+    .results-header { padding-left: 20px; padding-right: 20px; }
+    .gb-row { grid-template-columns: 1fr; }
+    .overall-banner-top { flex-direction: column; }
+    .overall-score-badge { text-align: left; }
+    .dim-card-header { flex-direction: column; }
+    .dim-card-badge { text-align: left; }
+  }
+</style>
+</head>
+<body>
+
+<div id="quiz-section">
+  <div class="header">
+    <div class="header-inner">
+      <div class="header-label">Martin Seligman · Positive Psychology</div>
+      <h1>The Optimism Test</h1>
+      <p class="header-sub">Read each situation and choose the explanation that feels most true for you — not what sounds best, but what you'd actually think.</p>
+    </div>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-inner">
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-fill" style="width:0%"></div></div>
+      <div class="progress-text" id="progress-text">0 of 48</div>
+      <div class="preset-btns">
+        <button class="preset-btn" onclick="applyPreset('optimist')" title="Fill with optimistic answers">😊 Optimist</button>
+        <button class="preset-btn" onclick="applyPreset('pessimist')" title="Fill with pessimistic answers">😔 Pessimist</button>
+      </div>
+    </div>
+  </div>
+  <div class="main" id="questions-container"></div>
+</div>
+
+<div id="results-section">
+  <div class="results-header">
+    <div class="results-header-inner">
+      <div class="results-overall-label">Your Results</div>
+      <h2 id="res-headline">—</h2>
+      <div class="overall-score-line" id="res-score-line">—</div>
+    </div>
+  </div>
+  <div class="results-body" id="results-body"></div>
+</div>
+
+<script>
+const QUESTIONS = [
+  { scenario: "The project you are in charge of is a great success.", a: "I kept a close watch over everyone's work", b: "Everyone devoted a lot of time and energy to it" },
+  { scenario: "You and your spouse (boyfriend/girlfriend) make up after a fight.", a: "I forgave him/her", b: "I'm usually forgiving" },
+  { scenario: "You get lost driving to a friend's house.", a: "I missed a turn", b: "My friend gave me bad directions" },
+  { scenario: "Your spouse (boyfriend/girlfriend) surprises you with a gift.", a: "He/she just got a raise at work", b: "I took him/her out to a special dinner the night before" },
+  { scenario: "You forget your spouse's (boyfriend's/girlfriend's) birthday.", a: "I'm not good at remembering birthdays", b: "I was preoccupied with other things" },
+  { scenario: "You get a flower from a secret admirer.", a: "I am attractive to him/her", b: "I am a popular person" },
+  { scenario: "You run for a community office position and you win.", a: "I devoted a lot of time and energy to campaigning", b: "I work very hard at everything I do" },
+  { scenario: "You miss an important engagement.", a: "Sometimes my memory fails me", b: "I sometimes forget to check my appointment book" },
+  { scenario: "You run for a community office position and you lose.", a: "I didn't campaign hard enough", b: "The person who won knew more people" },
+  { scenario: "You host a successful dinner.", a: "I was particularly charming that night", b: "I am a good host" },
+  { scenario: "You stop a crime by calling the police.", a: "A strange noise caught my attention", b: "I was alert that day" },
+  { scenario: "You were extremely healthy all year.", a: "Few people around me were sick, so I wasn't exposed", b: "I made sure I ate well and got enough rest" },
+  { scenario: "You owe the library ten dollars for an overdue book.", a: "When I am really involved in what I am reading, I often forget when it's due", b: "I was so involved in writing the report that I forgot to return the book" },
+  { scenario: "Your stocks make you a lot of money.", a: "My broker decided to take on something new", b: "My broker is a top-notch investor" },
+  { scenario: "You win an athletic contest.", a: "I was feeling unbeatable", b: "I train hard" },
+  { scenario: "You fail an important examination.", a: "I wasn't as smart as the other people taking the exam", b: "I didn't prepare for it well" },
+  { scenario: "You prepared a special meal for a friend and he/she barely touched the food.", a: "I wasn't a good cook", b: "I made the meal in a rush" },
+  { scenario: "You lose a sporting event for which you have been training for a long time.", a: "I'm not very athletic", b: "I'm not good at that sport" },
+  { scenario: "Your car runs out of gas on a dark street late at night.", a: "I didn't check to see how much gas was in the tank", b: "The gas gauge was broken" },
+  { scenario: "You lose your temper with a friend.", a: "He/she is always nagging me", b: "He/she was in a hostile mood" },
+  { scenario: "You are penalized for not returning your income tax forms on time.", a: "I always put off doing my taxes", b: "I was lazy about getting my taxes done this year" },
+  { scenario: "You ask a person out on a date and he/she says no.", a: "I was a wreck that day", b: "I got tongue-tied when I asked him/her on the date" },
+  { scenario: "A game-show host picks you out of the audience to participate in the show.", a: "I was sitting in the right seat", b: "I looked the most enthusiastic" },
+  { scenario: "You are frequently asked to dance at a party.", a: "I am outgoing at parties", b: "I was in perfect form that night" },
+  { scenario: "You buy your spouse (boyfriend/girlfriend) a gift he/she doesn't like.", a: "I don't put enough thought into things like that", b: "He/she has very picky tastes" },
+  { scenario: "You do exceptionally well in a job interview.", a: "I felt extremely confident during the interview", b: "I interview well" },
+  { scenario: "You tell a joke and everyone laughs.", a: "The joke was funny", b: "My timing was perfect" },
+  { scenario: "Your boss gives you too little time in which to finish a project, but you get it finished anyway.", a: "I am good at my job", b: "I am an efficient person" },
+  { scenario: "You've been feeling run-down lately.", a: "I never get a chance to relax", b: "I was exceptionally busy this week" },
+  { scenario: "You ask someone to dance and he/she says no.", a: "I am not a good enough dancer", b: "He/she doesn't like to dance" },
+  { scenario: "You save a person from choking to death.", a: "I know a technique to stop someone from choking", b: "I know what to do in crisis situations" },
+  { scenario: "Your romantic partner wants to cool things off for a while.", a: "I'm too self-centered", b: "I don't spend enough time with him/her" },
+  { scenario: "A friend says something that hurts your feelings.", a: "She always blurts things out without thinking of others", b: "My friend was in a bad mood and took it out on me" },
+  { scenario: "Your employer comes to you for advice.", a: "I am an expert in the area about which I was asked", b: "I'm good at giving useful advice" },
+  { scenario: "A friend thanks you for helping him/her get through a bad time.", a: "I enjoy helping him/her through tough times", b: "I care about people" },
+  { scenario: "You have a wonderful time at a party.", a: "Everyone was friendly", b: "I was friendly" },
+  { scenario: "Your doctor tells you that you are in good physical shape.", a: "I make sure I exercise frequently", b: "I am very health-conscious" },
+  { scenario: "Your spouse (boyfriend/girlfriend) takes you away for a romantic weekend.", a: "He/she needed to get away for a few days", b: "He/she likes to explore new areas" },
+  { scenario: "Your doctor tells you that you eat too much sugar.", a: "I don't pay much attention to my diet", b: "You can't avoid sugar, it's in everything" },
+  { scenario: "You are asked to head an important project.", a: "I just successfully completed a similar project", b: "I am a good supervisor" },
+  { scenario: "You and your spouse (boyfriend/girlfriend) have been fighting a great deal.", a: "I have been feeling cranky and pressured lately", b: "He/she has been hostile lately" },
+  { scenario: "You fall down a great deal while skiing.", a: "Skiing is difficult", b: "The trails were icy" },
+  { scenario: "You win a prestigious award.", a: "I solved an important problem", b: "I was the best employee" },
+  { scenario: "Your stocks are at an all-time low.", a: "I didn't know much about the business climate at the time", b: "I made a poor choice of stocks" },
+  { scenario: "You win the lottery.", a: "It was pure chance", b: "I picked the right numbers" },
+  { scenario: "You gain weight over the holidays and you can't lose it.", a: "Diets don't work in the long run", b: "The diet I tried didn't work" },
+  { scenario: "You are in the hospital and few people come to visit.", a: "I'm irritable when I am sick", b: "My friends are negligent about things like that" },
+  { scenario: "They won't honour your credit card at a store.", a: "I sometimes overestimate how much money I have", b: "I sometimes forget to pay my credit card bill" },
+];
+
+const SCORING = {
+  PmB: { qs: [5,13,20,21,29,33,42,46], answer: 'a' },
+  PmG: { qs: [2,10,14,15,24,26,38,40], answer: 'b' },
+  PvB: { qs: [8,17,18,22,32,44,48],    answer: 'a' },
+  PvG: { qs: [6,7,28,31,34,35,37,43],  answer: 'b' },
+  PsB: { qs: [3,9,16,19,25,30,39,41,47], answer: 'a' },
+  PsG: { qs: [1,4,11,12,23,27,36,45],  answer: 'b' },
+};
+
+const COPY = {
+  PmB: {
+    label: "Permanence of Bad Events (PmB)", type: 'bad', max: 8,
+    what: "How long do you believe bad events will last? Optimists see setbacks as temporary — something that happened, not something that defines the future. Pessimists see bad events as permanent states that will endure. Lower scores are more optimistic here.",
+    bands: [
+      { max: 2, label: "Very Optimistic", text: "When bad things happen, you see them as temporary. You're quick to recognise that a setback is a moment in time, not a life sentence. This is one of the most protective qualities in Seligman's framework — it means you bounce back, because you genuinely believe things will pass." },
+      { max: 4, label: "Optimistic", text: "You generally treat bad events as passing rather than permanent. You may occasionally catastrophise, but your default is to expect things to improve. This gives you reasonable resilience in the face of difficulty." },
+      { max: 6, label: "Moderately Pessimistic", text: "You have a noticeable tendency to see bad events as lasting. When something goes wrong, part of you believes it will stick around — whether that's a mood, a situation, or a relationship problem. This can make recovery slower and weigh on your outlook even when circumstances have actually improved." },
+      { max: 8, label: "Pessimistic", text: "You strongly tend to see bad events as permanent. Phrases like 'things never change', 'this always happens to me', or 'it's always going to be like this' probably feel true in difficult moments. This is one of the most direct contributors to low mood and hopelessness — and also one of the most changeable thought patterns with practice." },
+    ]
+  },
+  PmG: {
+    label: "Permanence of Good Events (PmG)", type: 'good', max: 8,
+    what: "Do you see good things as lasting or as flukes? Optimists believe good events reflect stable, enduring qualities — in themselves or the world. Pessimists see good events as temporary exceptions to an otherwise difficult reality. Higher scores are more optimistic here.",
+    bands: [
+      { max: 2, label: "Pessimistic", text: "Good things don't feel like they last for you. When something goes well, you're likely to attribute it to a one-off circumstance rather than something stable. Enjoyment may be tinged with awareness that it won't continue. This pattern can make it hard to feel sustained satisfaction, because good experiences feel like exceptions rather than the norm." },
+      { max: 4, label: "Moderately Pessimistic", text: "You have some tendency to treat good events as temporary. You can appreciate good things, but they may not feel particularly durable — you might not fully trust that they'll continue. Building on successes can feel uncertain because you're not fully convinced they reflect something lasting." },
+      { max: 6, label: "Optimistic", text: "You generally see good things as having some stability and continuity. A success is likely to feel meaningful rather than a fluke, and positive periods don't feel like they're about to collapse. This gives you a decent platform of confidence to build from." },
+      { max: 8, label: "Very Optimistic", text: "You see good things as lasting and representative of something real. A success is evidence of something true about you or your situation, not a lucky exception. This makes positive experiences genuinely nourishing — they build your sense of confidence and expectation rather than evaporating immediately." },
+    ]
+  },
+  PvB: {
+    label: "Pervasiveness of Bad Events (PvB)", type: 'bad', max: 7,
+    what: "Do you let one bad thing contaminate everything else? Optimists keep problems specific — a failure at work is a work problem, not a whole-life problem. Pessimists let bad events bleed universally into their sense of themselves and their life. Lower scores are more optimistic here.",
+    bands: [
+      { max: 1, label: "Very Optimistic", text: "You're very good at keeping problems contained. When something goes wrong in one area, it stays there — it doesn't seep into how you feel about everything else. This is a genuinely valuable quality: it means you can have a bad day at work and still enjoy dinner, or have a difficult relationship moment without it colouring your entire self-image." },
+      { max: 3, label: "Optimistic", text: "You mostly keep bad events specific rather than universal. You might occasionally let one difficulty affect your mood more broadly, but on the whole you're reasonably good at not letting problems define your whole experience." },
+      { max: 5, label: "Moderately Pessimistic", text: "When bad things happen, you have a noticeable tendency to let them spill over. A problem in one area can start to feel like a problem with everything — your abilities, your luck, your whole life. This makes difficult periods harder than they need to be, because you're dealing with more than just the original problem." },
+      { max: 7, label: "Pessimistic", text: "Bad events tend to feel universal for you. One failure can quickly become 'I'm a failure.' One difficult relationship can make all relationships feel impossible. This generalisation is one of the most exhausting cognitive patterns — it multiplies the weight of any single problem. Noticing when you're doing it is the first and most powerful step." },
+    ]
+  },
+  PvG: {
+    label: "Pervasiveness of Good Events (PvG)", type: 'good', max: 8,
+    what: "Do good things in one area spill positively into your overall sense of life? Optimists let a success at work make them feel good about themselves generally. Pessimists keep good things narrowly contained. Higher scores are more optimistic here.",
+    bands: [
+      { max: 2, label: "Pessimistic", text: "Good things don't seem to spread for you. A win in one area stays in that area — it doesn't give you a broader lift or reinforce a general sense of confidence. This means successes, though appreciated, don't build on each other. Your overall self-image may stay low even when individual things are going well." },
+      { max: 4, label: "Moderately Pessimistic", text: "You have some difficulty letting good things generalise. Successes feel real but contained — they don't reliably translate into a broader sense of wellbeing or confidence. You may find yourself discounting how well things are going overall, even when specific areas are genuinely positive." },
+      { max: 6, label: "Optimistic", text: "Good events tend to have a spreading effect for you. When something goes well, it gives you a lift that extends beyond just that situation. This means your confidence is reasonably well-fed by positive experiences, and you can use a success in one area to fuel energy in others." },
+      { max: 8, label: "Very Optimistic", text: "When good things happen, they colour your whole world. A success becomes evidence that things are generally going well; a positive interaction reinforces that people are good and life is rewarding. This is a genuinely buoyant quality — good experiences compound rather than staying isolated." },
+    ]
+  },
+  PsB: {
+    label: "Personalisation of Bad Events (PsB)", type: 'bad', max: 9,
+    what: "Do you blame yourself when things go wrong? High personalisation means taking responsibility for bad outcomes — sometimes appropriately, sometimes far beyond what's warranted. Seligman's view is that moderate externalising of bad events is healthy — not avoiding all responsibility, but not carrying the full weight of the world either. Lower scores are more optimistic here.",
+    bands: [
+      { max: 2, label: "Very Optimistic", text: "When bad things happen, you tend to look outward rather than blame yourself. You're good at recognising when circumstances, other people, or bad luck are the real cause. This protects your self-esteem and keeps your mood stable. The only thing to watch is that it doesn't tip into never taking responsibility when you genuinely should — but at this level, that's unlikely to be a problem." },
+      { max: 4, label: "Optimistic", text: "You have a healthy relationship with self-blame. You can acknowledge your role in things going wrong without turning it into an attack on yourself. You're reasonably good at distinguishing between 'I made a mistake' and 'I am a mistake' — a distinction that makes a significant difference to resilience." },
+      { max: 6, label: "Moderately Pessimistic", text: "You have a tendency to internalise bad events — to take them personally even when the causes are external or mixed. This might show up as guilt that lingers longer than it should, or a habit of reviewing what you did wrong even in situations where you weren't the main cause. Over time this can be tiring and erode self-confidence." },
+      { max: 9, label: "Pessimistic", text: "You strongly tend to blame yourself when things go wrong. Bad events feel like evidence of your inadequacy, your flaws, or your failures — even when the situation is more complex or the causes largely external. This has a direct impact on self-esteem. It's worth asking, in difficult moments: would I hold a friend as responsible as I'm holding myself right now?" },
+    ]
+  },
+  PsG: {
+    label: "Personalisation of Good Events (PsG)", type: 'good', max: 8,
+    what: "Do you take credit when good things happen? Optimists internalise good outcomes — their qualities, efforts, and presence are what made good things happen. Pessimists attribute good things to luck, timing, or other people. This dimension is closely tied to self-worth and confidence. Higher scores are more optimistic here.",
+    bands: [
+      { max: 2, label: "Pessimistic", text: "You rarely take credit for good outcomes. When things go well, your instinct is to attribute it to luck, to other people, to the situation — to something other than yourself. This means your self-esteem isn't being fed by your own successes. Over time it can create a sense that good things happen to you rather than because of you, which can make you feel passive in your own life and dependent on external sources of goodness — whether that's other people, relationships, or circumstances." },
+      { max: 4, label: "Moderately Pessimistic", text: "You have some difficulty owning good outcomes. You may acknowledge your role intellectually but not really feel it — success doesn't translate into lasting confidence or self-worth. You might deflect compliments, minimise your contributions, or quickly move on from wins without letting them land. This is a quiet drain on self-belief." },
+      { max: 6, label: "Optimistic", text: "You're reasonably good at taking credit for good things. When something goes well, you can recognise your role in it — your effort, your qualities, your choices. This feeds genuine confidence rather than the fragile kind that depends on external validation." },
+      { max: 8, label: "Very Optimistic", text: "You take genuine ownership of good outcomes. When things go well, you feel it — not arrogantly, but with a real sense that your qualities and efforts matter. This is one of the most nourishing patterns in Seligman's framework. Your confidence is self-sustaining rather than dependent on others, and success genuinely builds on success." },
+    ]
+  },
+  totalG: {
+    label: "Total Good Events Score (G)", max: 24,
+    what: "Your combined score across all three good-event dimensions — permanence, pervasiveness, and personalisation. This reflects your overall explanatory style when things go well. Maximum is 24.",
+    bands: [
+      { max: 10, label: "Great Pessimism", text: "Your overall approach to good events is strongly pessimistic. Across all three dimensions, you tend not to let good things stick, spread, or reflect well on you. Good experiences exist but don't build into a cumulative sense of wellbeing or confidence. The individual scores above will show you where the main gaps are." },
+      { max: 13, label: "Quite Pessimistic", text: "You have a fairly pessimistic explanatory style for good events. There are probably some dimensions working better than others — look at your individual scores to see where the drag is. Overall, good things don't tend to translate into lasting confidence or a broad positive outlook as much as they could." },
+      { max: 16, label: "Average", text: "Your response to good events is about average. You neither fully embrace good experiences as lasting and personal, nor dismiss them entirely. There's likely room to let more of the good things in your life actually land and build on each other." },
+      { max: 19, label: "Moderately Optimistic", text: "You have a reasonably optimistic approach to good events. You can let successes be meaningful, lasting, and reflective of who you are. This is a solid foundation — good experiences tend to build on each other and contribute to sustained confidence." },
+      { max: 24, label: "Very Optimistic", text: "You have a strongly optimistic approach to good events. When things go well, you allow them to be lasting, to spread across your life, and to reflect genuinely on you. This is a powerful engine for sustained wellbeing — your self-esteem is fed by your own experiences rather than existing independently of them." },
+    ]
+  },
+  totalB: {
+    label: "Total Bad Events Score (B)", max: 24,
+    what: "Your combined score across all three bad-event dimensions. Lower is more optimistic — optimists score low because they see setbacks as temporary, contained, and not entirely their fault.",
+    bands: [
+      { max: 6, label: "Marvellously Optimistic", text: "You handle adversity exceptionally well. Setbacks feel temporary, contained, and not a reflection of your fundamental worth. This is a strong protective factor against depression and one of the best predictors of resilience. You're unlikely to be derailed for long by difficulty." },
+      { max: 9, label: "Moderately Optimistic", text: "You have a reasonably healthy response to bad events. You don't tend to catastrophise or let problems define you. Difficult periods are unpleasant but recoverable, and you generally maintain perspective." },
+      { max: 11, label: "Average", text: "Your response to bad events is typical. You sometimes get pulled into seeing setbacks as lasting or all-encompassing, but not to an extreme degree. The individual dimension scores will show you where the main pressure points are." },
+      { max: 14, label: "Moderately Pessimistic", text: "Bad events weigh on you more than they need to. You have a tendency to see setbacks as lasting, wide-ranging, or personally damning — probably across more than one dimension. This makes difficult periods harder and recovery slower." },
+      { max: 24, label: "Very Pessimistic", text: "Adversity hits hard and tends to stick. Across permanence, pervasiveness, and personalisation, you're processing bad events in ways that amplify their impact rather than contain it. Seligman's key insight is that this is a learned style — which means it can be unlearned." },
+    ]
+  },
+  overall: {
+    label: "Overall Score (G − B)", max: null,
+    what: "Your total good-event score minus your total bad-event score. Positive means you lean optimistic overall, negative means you lean pessimistic. This is the broadest single measure of your explanatory style.",
+    bands: [
+      { max: 0, label: "Very Pessimistic", text: "Your overall explanatory style leans strongly pessimistic. Bad events are processed in ways that amplify them, while good events don't get the weight they deserve. This combination — underselling the good, overselling the bad — is the core pattern Seligman identifies as driving low mood and undermining resilience. The detailed scores above will show you which specific habits are doing the most work." },
+      { max: 2, label: "Moderately Pessimistic", text: "You lean pessimistic overall. The balance between how you process good and bad events tilts toward the negative — bad things feel bigger and more lasting than good things. It's not extreme, but it's a consistent tilt that shapes your general mood and expectations. Small shifts in one or two dimensions could meaningfully change this." },
+      { max: 5, label: "Average", text: "Your overall explanatory style is roughly in the middle. You have some optimistic and some pessimistic tendencies, and the balance is fairly even. Average here doesn't mean ideal — Seligman's research suggests a moderately optimistic style is associated with better outcomes — but you're not in a problematic range." },
+      { max: 8, label: "Moderately Optimistic", text: "Your overall explanatory style leans optimistic. You're better at letting good things count than letting bad things dominate. This is associated with greater resilience, higher achievement, and better mood. You likely recover reasonably well from setbacks and can draw genuine sustenance from things going well." },
+      { max: 999, label: "Very Optimistic", text: "Your overall explanatory style is strongly optimistic. The way you process both good and bad events works in your favour — successes feel meaningful and lasting, setbacks feel manageable and temporary. Seligman's research links this pattern to resilience, achievement, health, and sustained wellbeing." },
+    ]
+  },
+  hope: {
+    label: "Hopefulness (PmB + PvB)", max: 15,
+    what: "Seligman's specific measure of hopelessness — the sum of how permanent and how pervasive you see bad events. When both are high, you tend to believe that bad things will last forever and infect everything, which is the cognitive core of helplessness and depression risk. This is the one derived score he singles out as clinically significant.",
+    bands: [
+      { max: 3,  label: "Very Hopeful",          text: "You have a strongly hopeful outlook on adversity. When bad things happen, you don't tend to see them as either lasting or all-encompassing — you keep setbacks contained in time and scope. This is a powerful buffer against low mood and one of the strongest protective factors in Seligman's framework." },
+      { max: 6,  label: "Moderately Hopeful",     text: "You have a reasonably hopeful outlook. Setbacks don't typically feel permanent or universal to you. You may occasionally slip into 'this will never change' thinking, but it's not your default. This is a solid foundation for resilience." },
+      { max: 9,  label: "Moderately Hopeless",    text: "You have a noticeable tendency toward hopelessness when things go wrong. Bad events can feel both like they'll stick around and like they'll spread into other areas of life. This combination — permanence plus pervasiveness — is what Seligman identifies as the fuel for sustained low mood. It's worth paying close attention to which of the two (PmB or PvB) is higher, as that points to the more dominant habit." },
+      { max: 15, label: "Quite Hopeless",         text: "Your hopefulness score is high, meaning you tend to see bad events as both permanent and pervasive. This is the pattern most directly linked to hopelessness and depression in Seligman's research — not because your life is bad, but because the way you're interpreting setbacks amplifies their weight considerably. The encouraging part: this is a thinking style, not a personality trait, and it responds well to deliberate challenge." },
+    ]
+  }
+};
+
+function getBand(copy, score) {
+  return copy.bands.find(b => score <= b.max) || copy.bands[copy.bands.length - 1];
+}
+
+const answers = new Array(48).fill(null);
+
+function buildQuestions() {
+  const container = document.getElementById('questions-container');
+  container.innerHTML = '';
+  QUESTIONS.forEach((q, i) => {
+    const n = i + 1;
+    if (n === 1 || n === 13 || n === 25 || n === 37) {
+      const div = document.createElement('div');
+      div.className = 'section-divider';
+      const labels = ['Part One', 'Part Two', 'Part Three', 'Part Four'];
+      div.innerHTML = `<div class="section-divider-line"></div><div class="section-divider-label">${labels[Math.floor((n-1)/12)]}</div><div class="section-divider-line"></div>`;
+      container.appendChild(div);
+    }
+    const card = document.createElement('div');
+    card.className = 'question-card';
+    card.id = `card-${n}`;
+    card.innerHTML = `
+      <div class="q-number">Question ${n} of 48</div>
+      <div class="q-scenario">${q.scenario}</div>
+      <div class="q-choices">
+        <button class="q-choice" id="q${n}-a" onclick="selectAnswer(${n}, 'a')">
+          <span class="choice-label">A</span><span>${q.a}</span>
+        </button>
+        <button class="q-choice" id="q${n}-b" onclick="selectAnswer(${n}, 'b')">
+          <span class="choice-label">B</span><span>${q.b}</span>
+        </button>
+      </div>`;
+    container.appendChild(card);
+  });
+  const submitWrap = document.createElement('div');
+  submitWrap.className = 'submit-wrap';
+  submitWrap.innerHTML = `
+    <button class="submit-btn" id="submit-btn" onclick="showResults()" disabled>See My Results</button>
+    <div class="submit-note" id="submit-note">Answer all 48 questions to continue</div>`;
+  container.appendChild(submitWrap);
+}
+
+function applyPreset(type) {
+  const choice = type === 'optimist' ? 'b' : 'a';
+  for (let i = 1; i <= 48; i++) {
+    selectAnswer(i, choice);
+  }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function selectAnswer(qNum, choice) {
+  answers[qNum - 1] = choice;
+  document.getElementById(`q${qNum}-a`).classList.toggle('selected', choice === 'a');
+  document.getElementById(`q${qNum}-b`).classList.toggle('selected', choice === 'b');
+  document.getElementById(`card-${qNum}`).classList.add('answered');
+  const answered = answers.filter(a => a !== null).length;
+  document.getElementById('progress-fill').style.width = (answered / 48 * 100) + '%';
+  document.getElementById('progress-text').textContent = `${answered} of 48`;
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = answered < 48;
+  document.getElementById('submit-note').textContent = answered === 48
+    ? 'All questions answered — ready to score!'
+    : `${48 - answered} question${48 - answered !== 1 ? 's' : ''} remaining`;
+}
+
+function calcScores() {
+  const s = { PmB: 0, PmG: 0, PvB: 0, PvG: 0, PsB: 0, PsG: 0 };
+  for (const [dim, rule] of Object.entries(SCORING)) {
+    for (const qNum of rule.qs) {
+      if (answers[qNum - 1] === rule.answer) s[dim]++;
+    }
+  }
+  return s;
+}
+
+function dimCard(key, score) {
+  const c = COPY[key];
+  const band = getBand(c, score);
+  const pct = Math.round(score / c.max * 100);
+  const t = c.type;
+  return `
+    <div class="dim-card">
+      <div class="dim-card-header">
+        <div class="dim-card-title">${c.label}</div>
+        <div class="dim-card-badge">
+          <div class="dim-score ${t}">${score}<span style="font-size:1rem;font-weight:300;color:var(--ink2)"> / ${c.max}</span></div>
+          <div class="dim-band">${band.label}</div>
+        </div>
+      </div>
+      <div class="dim-bar-row">
+        <div class="dim-bar-bg"><div class="dim-bar-fill ${t}" style="width:0%" data-pct="${pct}"></div></div>
+        <div class="dim-bar-max">${c.max}</div>
+      </div>
+      <div class="dim-what">${c.what}</div>
+      <div class="dim-interp">${band.text}</div>
+    </div>`;
+}
+
+function showResults() {
+  const s = calcScores();
+  const G = s.PmG + s.PvG + s.PsG;
+  const B = s.PmB + s.PvB + s.PsB;
+  const overall = G - B;
+
+  const overallBand = getBand(COPY.overall, overall);
+  const gBand = getBand(COPY.totalG, G);
+  const bBand = getBand(COPY.totalB, B);
+  const hope = s.PmB + s.PvB;
+  const hopeBand = getBand(COPY.hope, hope);
+
+  document.getElementById('res-headline').textContent = overallBand.label;
+  document.getElementById('res-score-line').textContent = `G−B: ${overall > 0 ? '+' : ''}${overall} · G: ${G} · B: ${B}`;
+
+  const body = document.getElementById('results-body');
+  body.innerHTML = `
+    <div class="overall-banner">
+      <div class="overall-banner-top">
+        <div class="overall-banner-left">
+          <h3>${COPY.overall.label}</h3>
+          <div class="what">${COPY.overall.what}</div>
+        </div>
+        <div class="overall-score-badge">
+          <div class="score-num">${overall > 0 ? '+' : ''}${overall}</div>
+          <div class="score-band">${overallBand.label}</div>
+        </div>
+      </div>
+      <div class="overall-banner-interp">${overallBand.text}</div>
+    </div>
+
+    <div class="gb-row">
+      <div class="gb-card good">
+        <div class="gb-card-title">Total Good Events (G)</div>
+        <div class="gb-card-score good">${G}<span style="font-size:1.1rem;font-weight:300;color:var(--ink2)"> / 24</span></div>
+        <div class="gb-card-band">${gBand.label}</div>
+        <div class="gb-card-what">${COPY.totalG.what}</div>
+        <div class="gb-card-interp">${gBand.text}</div>
+      </div>
+      <div class="gb-card bad">
+        <div class="gb-card-title">Total Bad Events (B)</div>
+        <div class="gb-card-score bad">${B}<span style="font-size:1.1rem;font-weight:300;color:var(--ink2)"> / 24</span></div>
+        <div class="gb-card-band">${bBand.label}</div>
+        <div class="gb-card-what">${COPY.totalB.what}</div>
+        <div class="gb-card-interp">${bBand.text}</div>
+      </div>
+    </div>
+
+    <div class="dim-section-header">
+      <div class="dim-section-header-label good">Good Event Dimensions</div>
+      <div class="dim-section-header-line"></div>
+    </div>
+    ${dimCard('PmG', s.PmG)}
+    ${dimCard('PvG', s.PvG)}
+    ${dimCard('PsG', s.PsG)}
+
+    <div class="dim-section-header">
+      <div class="dim-section-header-line"></div>
+      <div class="dim-section-header-label bad">Bad Event Dimensions</div>
+      <div class="dim-section-header-line"></div>
+    </div>
+    ${dimCard('PmB', s.PmB)}
+    ${dimCard('PvB', s.PvB)}
+    ${dimCard('PsB', s.PsB)}
+
+    <div class="dim-section-header">
+      <div class="dim-section-header-line"></div>
+      <div class="dim-section-header-label" style="color:var(--accent);">Derived Score</div>
+      <div class="dim-section-header-line"></div>
+    </div>
+    <div class="dim-card" style="border-color:var(--accent);border-width:1.5px;">
+      <div class="dim-card-header">
+        <div class="dim-card-title">${COPY.hope.label}</div>
+        <div class="dim-card-badge">
+          <div class="dim-score" style="color:var(--accent);">${hope}<span style="font-size:1rem;font-weight:300;color:var(--ink2);"> / ${COPY.hope.max}</span></div>
+          <div class="dim-band">${hopeBand.label}</div>
+        </div>
+      </div>
+      <div class="dim-bar-row">
+        <div class="dim-bar-bg"><div class="dim-bar-fill" style="width:0%;background:var(--accent);" data-pct="${Math.round(hope/COPY.hope.max*100)}"></div></div>
+        <div class="dim-bar-max">${COPY.hope.max}</div>
+      </div>
+      <div class="dim-what">${COPY.hope.what}</div>
+      <div class="dim-interp">${hopeBand.text}</div>
+    </div>
+
+    <div class="export-bar">
+      <span class="export-label">Export</span>
+      <button class="export-btn" onclick="exportPrint()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        Print / Save as PDF
+      </button>
+      <button class="export-btn" id="copy-btn" onclick="exportCopy()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        Copy to Clipboard
+      </button>
+      <button class="export-btn" onclick="exportHTML()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Download Results
+      </button>
+    </div>
+    <div style="text-align:center;margin-top:20px;padding-bottom:40px;">
+      <button class="retry-btn" onclick="resetTest()">Take the test again</button>
+    </div>
+  `;
+
+  document.getElementById('quiz-section').style.display = 'none';
+  document.getElementById('results-section').style.display = 'block';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  setTimeout(() => {
+    document.querySelectorAll('.dim-bar-fill[data-pct]').forEach(el => {
+      el.style.width = el.dataset.pct + '%';
+    });
+  }, 200);
+
+  // Store scores for export
+  window._lastScores = { s, G, B, overall, overallBand, gBand, bBand, hope, hopeBand };
+}
+
+function exportPrint() {
+  window.print();
+}
+
+function exportCopy() {
+  const { s, G, B, overall, overallBand, gBand, bBand } = window._lastScores;
+  const lines = [
+    'SELIGMAN OPTIMISM TEST — RESULTS',
+    '='.repeat(40),
+    '',
+    `Overall Score (G − B): ${overall > 0 ? '+' : ''}${overall} — ${overallBand.label}`,
+    overallBand.text,
+    '',
+    `Total Good Events: ${G}/25 — ${gBand.label}`,
+    gBand.text,
+    '',
+    `Total Bad Events: ${B}/24 — ${bBand.label}`,
+    bBand.text,
+    '',
+    '— GOOD EVENT DIMENSIONS —',
+    '',
+  ];
+  for (const key of ['PmG', 'PvG', 'PsG']) {
+    const c = COPY[key];
+    const score = s[key];
+    const band = getBand(c, score);
+    lines.push(`${c.label}: ${score}/${c.max} — ${band.label}`);
+    lines.push(band.text);
+    lines.push('');
+  }
+  lines.push('— BAD EVENT DIMENSIONS —', '');
+  for (const key of ['PmB', 'PvB', 'PsB']) {
+    const c = COPY[key];
+    const score = s[key];
+    const band = getBand(c, score);
+    lines.push(`${c.label}: ${score}/${c.max} — ${band.label}`);
+    lines.push(band.text);
+    lines.push('');
+  }
+  const hope = s.PmB + s.PvB;
+  const hopeBand = getBand(COPY.hope, hope);
+  lines.push('— DERIVED SCORE —', '');
+  lines.push(`${COPY.hope.label}: ${hope}/${COPY.hope.max} — ${hopeBand.label}`);
+  lines.push(hopeBand.text);
+  lines.push('');
+  lines.push('Based on Martin Seligman\'s Learned Optimism (1991)');
+
+  navigator.clipboard.writeText(lines.join('\n')).then(() => {
+    const btn = document.getElementById('copy-btn');
+    btn.classList.add('copied');
+    btn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Copied!`;
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      btn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy to Clipboard`;
+    }, 2500);
+  });
+}
+
+function exportHTML() {
+  const { s, G, B, overall, overallBand, gBand, bBand } = window._lastScores;
+
+  // Build a clean standalone results HTML
+  let dimRows = '';
+  for (const [key, type, color] of [['PmG','good','#3a6b4a'],['PvG','good','#3a6b4a'],['PsG','good','#3a6b4a'],['PmB','bad','#8b3a3a'],['PvB','bad','#8b3a3a'],['PsB','bad','#8b3a3a']]) {
+    const c = COPY[key];
+    const score = s[key];
+    const band = getBand(c, score);
+    dimRows += `<div style="background:#faf7f2;border:1px solid #d9d0c0;border-radius:10px;padding:20px;margin-bottom:12px;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
+        <strong style="font-family:Georgia,serif;font-size:15px;">${c.label}</strong>
+        <span style="color:${color};font-family:Georgia,serif;font-size:1.4rem;font-weight:600;">${score}/${c.max} <small style="font-size:11px;color:#5c5248;text-transform:uppercase;letter-spacing:1px;">${band.label}</small></span>
+      </div>
+      <div style="font-size:12px;color:#5c5248;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid #d9d0c0;">${c.what}</div>
+      <div style="font-size:13.5px;line-height:1.7;">${band.text}</div>
+    </div>`;
+  }
+
+  const html = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
+<title>Optimism Test Results</title>
+<style>body{font-family:'DM Sans',sans-serif;background:#f5f0e8;color:#1a1612;max-width:720px;margin:0 auto;padding:32px 24px;line-height:1.6;}
+h1{font-family:Georgia,serif;font-size:2rem;}h2{font-family:Georgia,serif;font-size:1.3rem;margin:0 0 6px;}
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&display=swap');</style>
+</head><body>
+<div style="background:#1a1612;color:#f5f0e8;padding:32px;border-radius:12px;margin-bottom:24px;">
+  <div style="font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#d4874e;margin-bottom:8px;">Martin Seligman · Positive Psychology</div>
+  <h1 style="margin:0 0 6px;">Optimism Test Results</h1>
+  <div style="font-size:15px;color:#c8bfb0;">Overall score: ${overall > 0 ? '+' : ''}${overall} · Good: ${G} · Bad: ${B}</div>
+</div>
+<div style="background:#1a1612;color:#f5f0e8;border-radius:12px;padding:24px;margin-bottom:16px;">
+  <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#d4874e;margin-bottom:6px;">Overall Score</div>
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;">
+    <div style="flex:1;font-size:13px;color:#c8bfb0;">${COPY.overall.what}</div>
+    <div style="text-align:right;"><div style="font-family:Georgia,serif;font-size:2.5rem;color:#d4874e;line-height:1;">${overall > 0 ? '+' : ''}${overall}</div><div style="font-size:11px;color:#c8bfb0;text-transform:uppercase;letter-spacing:1px;">${overallBand.label}</div></div>
+  </div>
+  <div style="font-size:13.5px;color:#d8cfbf;border-top:1px solid #333;padding-top:12px;margin-top:12px;">${overallBand.text}</div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;">
+  <div style="background:#faf7f2;border:1px solid #d9d0c0;border-left:4px solid #3a6b4a;border-radius:10px;padding:20px;">
+    <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#5c5248;margin-bottom:6px;">Total Good Events</div>
+    <div style="font-family:Georgia,serif;font-size:2rem;color:#3a6b4a;">${G}<span style="font-size:1rem;color:#5c5248;font-weight:300;"> / 25</span></div>
+    <div style="font-size:12px;font-weight:500;color:#5c5248;margin-bottom:8px;">${gBand.label}</div>
+    <div style="font-size:13px;line-height:1.65;">${gBand.text}</div>
+  </div>
+  <div style="background:#faf7f2;border:1px solid #d9d0c0;border-left:4px solid #8b3a3a;border-radius:10px;padding:20px;">
+    <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#5c5248;margin-bottom:6px;">Total Bad Events</div>
+    <div style="font-family:Georgia,serif;font-size:2rem;color:#8b3a3a;">${B}<span style="font-size:1rem;color:#5c5248;font-weight:300;"> / 24</span></div>
+    <div style="font-size:12px;font-weight:500;color:#5c5248;margin-bottom:8px;">${bBand.label}</div>
+    <div style="font-size:13px;line-height:1.65;">${bBand.text}</div>
+  </div>
+</div>
+${dimRows}
+<p style="font-size:12px;color:#5c5248;margin-top:24px;text-align:center;">Based on Martin Seligman's <em>Learned Optimism</em> (1991)</p>
+</body></html>`;
+
+  const blob = new Blob([html], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'optimism-test-results.html';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function resetTest() {
+  answers.fill(null);
+  document.getElementById('quiz-section').style.display = 'block';
+  document.getElementById('results-section').style.display = 'none';
+  buildQuestions();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+buildQuestions();
+</script>
+</body>
+</html>
