@@ -1,6 +1,6 @@
 # Seligman Optimism Test
 
-An interactive web app based on Martin Seligman's Attributional Style Questionnaire (ASQ), as described in *Learned Optimism* (1991). Built as a single self-contained HTML file — no dependencies, no backend, no data collected.
+An interactive web app based on Martin Seligman's Attributional Style Questionnaire (ASQ), as described in *Learned Optimism* (1991). Built as a single self-contained HTML file — no dependencies, no backend, no data collected. [Take the test →](https://yourusername.github.io/optimism-test) 
 
 ## What it does
 
@@ -36,14 +36,6 @@ Each score comes with a band label and a detailed plain-English interpretation.
 
 Responses are scored according to the original ASQ key. Higher scores on good-event dimensions and lower scores on bad-event dimensions indicate a more optimistic explanatory style.
 
-## Usage
-
-Just open `index.html` in any modern browser. No installation, no internet connection required (except for loading the Google Fonts, which degrade gracefully if unavailable).
-
-## Live version
-
-[Take the test →](https://yourusername.github.io/optimism-test) 
-
-## Based on
+## Reference
 
 Seligman, M. E. P. (1991). *Learned Optimism*. Knopf.
