@@ -300,14 +300,14 @@ const COPY = {
     ]
   },
   totalG: {
-    label: "Total Good Events Score (G)", max: 25,
-    what: "Your combined score across all three good-event dimensions — permanence, pervasiveness, and personalisation. This reflects your overall explanatory style when things go well.",
+    label: "Total Good Events Score (G)", max: 24,
+    what: "Your combined score across all three good-event dimensions — permanence, pervasiveness, and personalisation. This reflects your overall explanatory style when things go well. Maximum is 24.",
     bands: [
       { max: 10, label: "Great Pessimism", text: "Your overall approach to good events is strongly pessimistic. Across all three dimensions, you tend not to let good things stick, spread, or reflect well on you. Good experiences exist but don't build into a cumulative sense of wellbeing or confidence. The individual scores above will show you where the main gaps are." },
       { max: 13, label: "Quite Pessimistic", text: "You have a fairly pessimistic explanatory style for good events. There are probably some dimensions working better than others — look at your individual scores to see where the drag is. Overall, good things don't tend to translate into lasting confidence or a broad positive outlook as much as they could." },
       { max: 16, label: "Average", text: "Your response to good events is about average. You neither fully embrace good experiences as lasting and personal, nor dismiss them entirely. There's likely room to let more of the good things in your life actually land and build on each other." },
       { max: 19, label: "Moderately Optimistic", text: "You have a reasonably optimistic approach to good events. You can let successes be meaningful, lasting, and reflective of who you are. This is a solid foundation — good experiences tend to build on each other and contribute to sustained confidence." },
-      { max: 25, label: "Very Optimistic", text: "You have a strongly optimistic approach to good events. When things go well, you allow them to be lasting, to spread across your life, and to reflect genuinely on you. This is a powerful engine for sustained wellbeing — your self-esteem is fed by your own experiences rather than existing independently of them." },
+      { max: 24, label: "Very Optimistic", text: "You have a strongly optimistic approach to good events. When things go well, you allow them to be lasting, to spread across your life, and to reflect genuinely on you. This is a powerful engine for sustained wellbeing — your self-esteem is fed by your own experiences rather than existing independently of them." },
     ]
   },
   totalB: {
@@ -476,7 +476,7 @@ function showResults() {
     <div class="gb-row">
       <div class="gb-card good">
         <div class="gb-card-title">Total Good Events (G)</div>
-        <div class="gb-card-score good">${G}<span style="font-size:1.1rem;font-weight:300;color:var(--ink2)"> / 25</span></div>
+        <div class="gb-card-score good">${G}<span style="font-size:1.1rem;font-weight:300;color:var(--ink2)"> / 24</span></div>
         <div class="gb-card-band">${gBand.label}</div>
         <div class="gb-card-what">${COPY.totalG.what}</div>
         <div class="gb-card-interp">${gBand.text}</div>
